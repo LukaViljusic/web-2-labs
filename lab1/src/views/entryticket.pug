@@ -1,0 +1,38 @@
+doctype html
+html
+  head
+    style 
+        include ../public/css/site.css
+    title Loto App
+  body
+    div(class="nav") 
+      a(href='/')
+        h1 Web2 Loto
+      
+      input(type="button", value="Odjavi se", class="button logout", id="logoutButton")
+
+    div(class="main")
+      h1 Unesi podatke loto listića
+      div(class="loto-div")
+        p Broj osobne iskaznice/putovnice:
+        input(type="text", class="textfield", placeholder="npr. 123456789", id="idNumber")
+        p(class="p-error", id="errorNumberId", hidden="true") Neispravan broj osobne iskaznice/putovnice
+
+        p Unesi 6–10 brojeva (1–45) odvojenih zarezom:
+        input(type="text", class="textfield", placeholder="npr. 1, 3, 12, 47...", id="lotoNumbers")
+        p(class="p-error", id="errorLotoNumbers")
+        button(type="submit", class="button send disabled", id="submitButton") Pošalji listić
+
+
+      div(class="qr-modal", id="modalId")
+        div(class="modal-header")
+          p QR-Code
+          button(id="close-button") Zatvori 
+        
+        a(id="QRCode-link", target="_blank")
+          img(alt="QR code", id="QRCode-img")
+
+    script 
+            include ../public/js/site.js
+    
+

@@ -1,0 +1,27 @@
+html
+    header 
+        style 
+            include ../public/css/site.css
+        title Odabrani brojevi
+    body 
+        h1(class="nums-title") Odabrani brojevi!
+        div(class="picked-nums")
+            each num in lotoNums
+                - let colorClass = ''
+                - if (num >= 1 && num <= 10) colorClass = 'blue'
+                - else if (num >= 11 && num <= 20) colorClass = 'red'
+                - else if (num >= 21 && num <= 30) colorClass = 'green'
+                - else colorClass = 'yellow'
+                div(class=`nums ${colorClass}`)= num
+
+        if resultNums
+            h1(class="nums-title") Izvučeni brojevi!
+            div(class="picked-nums")
+                each num in resultNums
+                    - let colorClass = ''
+                    - if (num >= 1 && num <= 10) colorClass = 'blue'
+                    - else if (num >= 11 && num <= 20) colorClass = 'red'
+                    - else if (num >= 21 && num <= 30) colorClass = 'green'
+                    - else colorClass = 'yellow'
+                    div(class=`nums ${colorClass}`)= num
+

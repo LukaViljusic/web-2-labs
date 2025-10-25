@@ -1,0 +1,48 @@
+doctype html
+html
+  head
+    style 
+        include ../public/css/site.css
+    title Loto App
+  body
+    div(class="nav") 
+      a(href='/')
+        h1 Web2 Loto
+    if isAuthenticated
+      input(type="button", value="Odjavi se", class="button logout", id="logoutButton")
+      
+      if(ticketCount)
+        div(class="end")
+          a(href="/entry-ticket", class="entry-ticket") Uplati listić
+
+      div(class="main")
+        h1 Dobrodošao #{user.name}!
+        
+    else
+      div(class="login-form")
+        h2 Nisi prijavljen!
+        input(type="button", value="Prijavi se", class="button", id="loginButton")
+
+    if(ticketCount)
+      div(class="ticket-count")
+        h2 Trenutno
+        h1 #{ticketCount}
+        h2 uplaćenih listića u ovom kolu!
+    else 
+      div(class="ticket-count")
+        h2 Trenutno nema otvorenih kola!
+    if (resultNums)
+      h1(class="nums-title") Izvučeni brojevi zadnjeg kola!
+      div(class="picked-nums")
+          each num in resultNums
+              - let colorClass = ''
+              - if (num >= 1 && num <= 10) colorClass = 'blue'
+              - else if (num >= 11 && num <= 20) colorClass = 'red'
+              - else if (num >= 21 && num <= 30) colorClass = 'green'
+              - else colorClass = 'yellow'
+              div(class=`nums ${colorClass}`)= num
+
+    script 
+            include ../public/js/site.js
+    
+
