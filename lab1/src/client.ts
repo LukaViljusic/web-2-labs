@@ -69,7 +69,8 @@ app.post('/new-ticket', requiresAuth(), async (req, res) => {
         return;
       }
 
-      const url = `https://localhost:4010/loto-numbers/${ticketId}`;
+      let webAppUrl = process.env.RENDER_EXTERNAL_URL || `https://localhost:${port}`;
+      const url = `${webAppUrl}/loto-numbers/${ticketId}`;
 
       const qrData = await QRCode.toDataURL(url);
       res.json({
