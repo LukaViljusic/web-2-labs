@@ -6,7 +6,7 @@ dotenv.config();
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
-    database: 'Web2-LotoAppDB',
+    database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     ports: 5432,
     ssl: false
