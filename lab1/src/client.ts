@@ -13,6 +13,10 @@ const app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+const externalUrl = process.env.RENDER_EXTERNAL_URL;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 4010;
+const hostname = externalUrl ? '0.0.0.0' : '127.0.0.1';
+
 const config = {
     authRequired: false,
     auth0Logout: true,
@@ -75,10 +79,16 @@ app.get('/loto-numbers/:uuid', async (req, res) => {
 });
 
 
-https.createServer({
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.cert')
-}, app).listen(4010, () => {
-    console.log("✅ Server running on https://localhost:4010");
-});
+if (externalUrl) {
+  app.listen(port, hostname, () => {
+      console.log(`Server running on http://${hostname}:${port}/ and accessible externally at ${externalUrl}`);
+  });
+} else {
+  https.createServer({
+      key: fs.readFileSync('server.key'),
+      cert: fs.readFileSync('server.cert')
+  }, app).listen(port, () => {
+      console.log(`Server running locally at https://localhost:${port}/`);
+  });
+}
   

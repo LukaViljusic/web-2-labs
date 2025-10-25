@@ -14,6 +14,10 @@ const jwtCheck = auth({
 
 app.use(jwtCheck);
 
+const externalUrl = process.env.RENDER_EXTERNAL_URL;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 4091;
+const hostname = externalUrl ? '0.0.0.0' : '127.0.0.1';
+
 app.post('/new-round', async function(req, res) {
   try {
     const result = await openNewRound();
@@ -86,10 +90,7 @@ app.post('/store-results', async function(req, res) {
   }
 });
 
-
-const hostname = '127.0.0.1';
-const port = 4091;
-
 app.listen(port, hostname, () => {
-  console.log(`✅ Web API running at http://${hostname}:${port}/`);
+  console.log(`Web API running at http://${hostname}:${port}/`);
+  if (externalUrl) console.log(`Accessible externally at ${externalUrl}`);
 });

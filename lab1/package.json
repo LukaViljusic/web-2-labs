@@ -4,7 +4,9 @@
     "clean": "shx rm -rf dist",
     "copy-views": "shx cp -r src/views/ dist",
     "copy-public": "shx cp -r src/public/ dist/public",
-    "start": "concurrently --kill-others \"npm:client\" \"npm:web-service\"",
+    "start": "node dist/client.js",
+    "start-webapi": "node dist/webapi.js",
+    "dev": "concurrently --kill-others \"npm:client\" \"npm:web-service\"",
     "client": "node dist/client.js",
     "web-service": "node dist/webapi.js"
   },
