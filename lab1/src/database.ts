@@ -16,7 +16,7 @@ export async function getLastRoundId() {
     try {
         const result = await pool.query('SELECT * FROM rounds ORDER BY id DESC LIMIT 1');
 
-        if (result.rows.length === 0) return 0;
+        if (result === undefined || result.rows[0] === undefined) return 0;
 
         return result.rows[0].id;
     } catch(err) {
@@ -36,6 +36,9 @@ export async function insertTicket(auth0Id: string, idNumber: string, lotoNumber
              VALUES ($1, $2, $3, $4) RETURNING *`,
             [auth0Id, roundId, idNumber, lotoNumbers]
         );
+
+        if (result === undefined || result.rows[0] === undefined) return 0;
+
         return result.rows[0].id;
     } catch (err) {
         console.error('Greška pri unosu tiketa:', err);
@@ -47,7 +50,8 @@ export async function getOpenRoundId() {
     try {
         const result = await pool.query('SELECT * FROM rounds ORDER BY id DESC LIMIT 1');
 
-        if (result.rows.length === 0) return 0;
+        if (result === undefined || result.rows[0] === undefined) return 0;
+        
         if(result.rows[0].active)
             return result.rows[0].id;
 
@@ -65,7 +69,7 @@ export async function getLotoNumbersById(uuid: string) {
             [uuid]
         );
 
-        if (result.rows.length === 0) return null;
+        if (result === undefined || result.rows[0] === undefined) return null;
 
         return {
             numbers: result.rows[0].numbers,
@@ -81,6 +85,9 @@ export async function getLotoNumbersById(uuid: string) {
 async function getOpenRound() {
     try {
         const result = await pool.query('SELECT * FROM rounds ORDER BY id DESC LIMIT 1');
+
+        if (result === undefined || result.rows[0] === undefined) return false;
+
         return result.rows[0].active;
     } catch(err) {
         console.error('Greška pri dohvatu podataka o rundi:', err);
@@ -97,6 +104,8 @@ export async function openNewRound() {
         const result = await pool.query(`INSERT INTO rounds (active) 
              VALUES ($1) RETURNING *`,
             ['true']);
+
+        if (result === undefined || result.rows[0] === undefined) return false;
 
         return true;
     } catch(err) {
@@ -124,6 +133,8 @@ export async function closeRound() {
     try {
         const result = await pool.query(`UPDATE rounds SET active = ($1) WHERE id = ($2)`,
             ['false', roundId]);
+
+        if (result === undefined || result.rows[0] === undefined) return false;
 
         return true;
     } catch(err) {
@@ -157,7 +168,7 @@ export async function getTicketsCount() {
             [roundId]
         )
 
-        if(result === undefined) return;
+        if (result === undefined || result.rows[0] === undefined) return false;
 
         return result.rows[0].ticketcount;
     } catch(err) {
