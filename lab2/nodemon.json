@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "views"],
+  "ext": "ts,pug,css,js",
+  "ignore": ["node_modules"],
+  "exec": "ts-node src/app.ts"
+}

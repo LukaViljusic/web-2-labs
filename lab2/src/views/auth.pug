@@ -1,0 +1,39 @@
+html 
+    head
+        style 
+            include ../public/css/site.css
+        title Broken Authentication
+    body 
+        div(class="main")
+            h1 Broken Authentication
+            
+            if !loggedIn
+                div(class="feature-toggle")
+                    h2 Uključi/isključi funkcionalnost
+                    label(class="switch")
+                        input(type="checkbox" id="switch")
+                        span(class="slider") 
+        
+                div(class="form")
+                    h3 Email
+                    input(type="email" class="textfield" id="username")
+                    h3 Password
+                    input(type="password" class="textfield" id="password")
+                    p(id="errorLabel")
+                    button(id="login-button" class="btn") Login 
+            else 
+
+                button(id="logout-button" class="btn") Logout
+                a(href="/profile")
+                    button(id="profile-button" class="btn") Go to Profile with session cookie
+
+                button(id="steal-button" class="btn") Steal cookie!
+                h3 Access private page
+                p Enter cookie value manually:
+                input(type="text" class="textfield auth" id="cookie-value")
+                button(id="private-button" class="btn") GO
+
+
+    script 
+        include ../public/js/site.js
+

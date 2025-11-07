@@ -1,0 +1,34 @@
+html 
+    head
+        style 
+            include ../public/css/site.css
+        title SQL Injection
+    body 
+        div(class="main")
+            h1 SQL Injection
+            
+            div(class="feature-toggle")
+                h2 Uključi/isključi funkcionalnost
+                label(class="switch")
+                    input(type="checkbox" id="switch")
+                    span(class="slider") 
+
+            div(class="sql-injection")
+                div(class="form")
+                    h2 Find user by username:
+                    input(type="text" class="textfield" id="query")
+                    button(id="sql-injection-button" class="btn") Search 
+            
+            details 
+                summary Upotrijebljeni primjeri
+                div 
+                    p Primjeri:
+                    ol 
+                        li ' OR 1=1;--
+                        li ' LIKE '%
+                        li ' OR (pg_sleep(0.5) IS NULL)--
+                        li ' UNION ALL SELECT null, version(), null, null, null, null, null -- 
+                        li '; DELETE FROM users where id = 10 --
+    script 
+        include ../public/js/site.js
+
