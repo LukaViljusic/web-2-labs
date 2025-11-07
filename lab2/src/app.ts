@@ -3,7 +3,9 @@ import path from 'path';
 import { attempsRemaining, getUsers, login } from './database'
 import bcrypt from 'bcrypt'
 import cookieParser from 'cookie-parser'
+import dotenv from 'dotenv'
 
+dotenv.config();
 const app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -11,6 +13,9 @@ app.set("view engine", "pug");
 app.use(express.json());
 app.use(cookieParser());
 
+const externalUrl = process.env.RENDER_EXTERNAL_URL;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 4010;
+const hostname = externalUrl ? '0.0.0.0' : '127.0.0.1';
 const sessions: Record<string, { username: string, created: number }> = {};
 
 app.get("/", function (req, res) {
@@ -160,9 +165,7 @@ app.get('/profile', (req, res) => {
     return res.render('profile', { username: sessions[sid].username });
 });
 
-const port = 4010;
-const hostname = "127.0.0.1";
 
 app.listen(port, hostname, () => {
-    console.log(`Server running on http://${hostname}:${port}`);
-});
+      console.log(`Server running on http://${hostname}:${port}/ and accessible externally at ${externalUrl}`);
+  });
