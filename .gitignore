@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # macOS system files
 .DS_Store
+
+# Readme files
+**/README.txt
