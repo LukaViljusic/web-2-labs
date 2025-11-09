@@ -17,6 +17,7 @@ const externalUrl = process.env.RENDER_EXTERNAL_URL;
 const port = process.env.PORT ? parseInt(process.env.PORT) : 4010;
 const hostname = externalUrl ? '0.0.0.0' : '127.0.0.1';
 const sessions: Record<string, { username: string, created: number }> = {};
+const loginDelays = {};
 
 app.get("/", function (req, res) {
     res.render("index");
@@ -86,10 +87,17 @@ app.post("/login", async (req, res) => {
 
         console.log(user);
         
-        if (user.attempsremaining <= 0) {
+        if (user.attempsremaining <= 1) {
             return res.status(400).json({ message: `Your account is blocked, contact administrator!` })
         }
 
+        const now = Date.now();
+        const delayData = loginDelays[username] || { failedCount: 0, nextAllowedTime: 0};
+
+        if(delayData.nextAllowedTime > now) {
+            const waitSeconds = Math.ceil((delayData.nextAllowedTime - now) / 1000);
+            return res.status(429).json({ message: `Please wait ${waitSeconds}s before next login attempt.` });
+        }
         const isCorrectPassword = await bcrypt.compare(password, user.password);
 
         console.log(isCorrectPassword);
@@ -102,12 +110,26 @@ app.post("/login", async (req, res) => {
             } catch(err) {
                 return res.status(500).json({ error: 'Server error' });
             }
+
+            delayData.failedCount++;
+
+            if(delayData.failedCount >= 3) {
+                const baseDelay = 5000;
+                const multiplier = Math.pow(2, delayData.failedCount - 3); // eksponencijalni rast
+                const waitTime = baseDelay * multiplier;
+                delayData.nextAllowedTime = now + waitTime;
+            }
+
+            loginDelays[username] = delayData;
+
             return res.status(400).json({ message: `Couldn't found your account. ${user.attempsremaining} attempts left.` })
         }
 
-        if(user.attempsremaining < 5) {
-            user = await attempsRemaining(user.id, 5);
+        if(user.attempsremaining < 10) {
+            user = await attempsRemaining(user.id, 10);
         }
+
+        loginDelays[username] = { failedCount: 0, nextAllowedTime: 0 };
 
         const secureId = crypto.randomUUID();
         console.log(secureId);
