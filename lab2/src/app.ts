@@ -84,8 +84,6 @@ app.post("/login", async (req, res) => {
         if (user === null) {
             return res.status(400).json({ message: `Couldn't found your account.` })
         }
-
-        console.log(user);
         
         if (user.attempsremaining <= 1) {
             return res.status(400).json({ message: `Your account is blocked, contact administrator!` })
@@ -100,12 +98,10 @@ app.post("/login", async (req, res) => {
         }
         const isCorrectPassword = await bcrypt.compare(password, user.password);
 
-        console.log(isCorrectPassword);
         
 
         if(!isCorrectPassword) {
             try {
-                console.log(user.id, user.attempsremaining);
                 user = await attempsRemaining(user.id, user.attempsremaining-1);
             } catch(err) {
                 return res.status(500).json({ error: 'Server error' });
@@ -115,7 +111,7 @@ app.post("/login", async (req, res) => {
 
             if(delayData.failedCount >= 3) {
                 const baseDelay = 5000;
-                const multiplier = Math.pow(2, delayData.failedCount - 3); // eksponencijalni rast
+                const multiplier = Math.pow(2, delayData.failedCount - 3);
                 const waitTime = baseDelay * multiplier;
                 delayData.nextAllowedTime = now + waitTime;
             }
@@ -132,7 +128,6 @@ app.post("/login", async (req, res) => {
         loginDelays[username] = { failedCount: 0, nextAllowedTime: 0 };
 
         const secureId = crypto.randomUUID();
-        console.log(secureId);
 
         sessions[secureId] = { username, created: Date.now() };
 
@@ -152,7 +147,6 @@ app.post('/logout', (req, res) => {
     const sid = req.cookies['sessionId'];
 
     if (sid && sessions[sid]) {
-        console.log(`Logging out session: ${sid}`);
         delete sessions[sid];
     }
 
@@ -168,7 +162,6 @@ app.post('/logout', (req, res) => {
 
 app.get('/profile-attack', (req, res) => {
     const sid = req.query.cookie as string;
-    console.log(sid);
     if (!sid || !sessions[sid]) {
         return res.status(401).end("Unauthorized");
     }
@@ -178,7 +171,6 @@ app.get('/profile-attack', (req, res) => {
 
 app.get('/profile', (req, res) => {
     const sid = req.cookies.sessionId;
-    console.log('SessionId:', sid);
 
     if (!sid || !sessions[sid]) {
         return res.status(401).end("Unauthorized");
