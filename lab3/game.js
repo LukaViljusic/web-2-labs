@@ -1,16 +1,24 @@
+// Konstante vrijednosti igre
+
+// Dimenzije igraće površine
 const gameArea = {
     width: 800,
     height: 600
 };
 
+// Broj redova i stupaca cigli, sveukupno 50 cigli
 const rows = 5;
 const cols = 10;
 
+
+// Veličina cigli, širina i visina
 const brickSize = {
     width: 44.5,
     height: 18
 };
 
+// Definicija igrača koji u sebi sadrži širinu i visinu palice
+// brzinu kretanje i poziciju na x i y osi na kojoj se nalazi
 const player = {
     width: 150,
     height: 18, 
@@ -19,6 +27,8 @@ const player = {
     positionY: 450
 }
 
+// Definicija loptice koja ima visinu i širinu 15, pozicija loptice
+// smjer kretanja loptice i multiplikator koji povećava brzinu loptice
 const ball = {
     width: 15,
     height: 15,
@@ -29,18 +39,25 @@ const ball = {
     multiplayer: 1.05
 }
 
+// Definiranje ostalih varijabli, odnosno liste cigli, boolean za provjeru je li 
+// pokrenuta odnosno je li gotova igra, i varijable za praćenje bodova
 let bricks = [];
 let gameStarted = false;
 let gameOver = false;
 let score = 0;
 let maxScore = 0;
 
+// definiranje varijabli za pokretanje zvuka pri nekoj akciji
 const hit_brick_sound = new Audio("hit_brick.mp3");
 const hit_paddle_sound = new Audio("hit_paddle.mp3");
 const game_start_sound = new Audio("gamestart.mp3");
 const game_over_sound = new Audio("gameover.mp3");
 const winner_sound = new Audio("winner.mp3");
 
+
+// Prilikom pritiska tipke space ako je prvo pokretanje igre,
+// odnosno ako je igrač izgubio, inicijalizira se igra 
+// i smjer loptice te se pokreće adekvatni zvuk
 const handlePressKey = (event, context) => {
     switch(event.keyCode) {
         case 32:
@@ -66,11 +83,14 @@ const handlePressKey = (event, context) => {
     }
 }
 
+// Brisanje trenutnog stanja canvas i pokretanje postavljanja cigli u listu
 const initGame = (context) =>  {
     context.clearRect(0, 0, gameArea.width, gameArea.height);
     initBricks();
 }
 
+// Ponovno postavljanje inicijalnih vrijednosti igre, 
+// kada igrač izgubi da ponovno može pokrenuti igru pritiskom na tipku space
 const resetGame = () => {
     player.positionX = gameArea.width/2 - player.width/2;
 
@@ -84,6 +104,9 @@ const resetGame = () => {
     score = 0;
 }
 
+
+// Iscrtavanje trenutnog broja i maksimalnog broja bodova
+// na predviđeno mjesto
 const drawScore = (context) => {
     context.font = "bold italic 18px Helvetica";
     context.textBaseline = "top";
@@ -96,6 +119,8 @@ const drawScore = (context) => {
     context.fillText("Max score: " + maxScore, gameArea.width - 20, 20);
 }
 
+// Iscrtavanje cigli koji su definirani u listi bricks
+// te iscrtavanje sijena i gradijenta
 const drawBricks = (context) => {
     bricks.forEach((brick) => {
         context.save();
@@ -131,6 +156,8 @@ const drawBricks = (context) => {
     });
 };
 
+// Iscrtavanje igrača vertikalno na sredini ekrana, pri dnu ekrana
+// te dodavanje sijena i gradijenta
 const drawPlayer = (context) => {
     context.save();
     context.shadowColor = 'rgba(40,40,40,0.35)';
@@ -165,6 +192,8 @@ const drawPlayer = (context) => {
     context.restore();
 };
 
+// Iscrtavanje loptice na vrhu palice, napočetku se slučajnim odabirom bira smjer kretanja 
+// loptice, gore lijevo, odnosno gore desno
 const drawBall = (context) => {
     const centerX = ball.positionX + ball.width/2;
     const centerY = ball.positionY + ball.height/2;
@@ -206,7 +235,8 @@ const drawBall = (context) => {
     context.restore();
 };
 
-
+// Pomicanje loptice tako da se pomiče za isti iznos x i y os
+// tako da se kreće pod 45°
 const moveBall = () => {
     ball.positionX += ball.moveX;
     ball.positionY += ball.moveY;
@@ -214,6 +244,16 @@ const moveBall = () => {
     checkCollisions();
 }
 
+// Provjera je li se loptica sudarila sa nečime, prvo se provjerava
+// je li loptica imala sudar sa zidom na način da se provjerava je li X os manja,
+// 0, odnosno veća od širine canvas, nakon toga provjerava se je li loptica udarila 
+// vrh canvas, ako se dogodio sudar promjeni se smjer kretanje loptice na način da 
+// se promjeni predznak x ili y smjera kretanja loptice, nakon toga provjerava se 
+// da li se loptica sudarila sa igračem (palicom), 
+// ako je promjeni se y smjer kretanja loptice i pokrene se zvuk, sljedeće se 
+// provjerava je li loptica udarila neku ciglu, ako je onda se ta cigla miče iz liste,
+// nakraju se provjerava je li loptica pala ispod palice, odnosno ako je pozicija loptice,
+// veća od pozicije dimenzije canvas, ukoliko je igra završava
 const checkCollisions = () => {
     if(ball.positionX <= 0 || ball.positionX + ball.width >= gameArea.width) {
         ball.moveX = -ball.moveX;
@@ -263,7 +303,10 @@ const checkCollisions = () => {
     }
 }
 
-function isCornerHit(ball, brick) {
+// Funkcija koja provjerava je li loptica udarila kut 
+// cigle, ukoliko je kut udaren onda se povećava brzina kretanja 
+// loptice za multiplikator
+const isCornerHit = (ball, brick) => {
     const ballCenterX = ball.positionX + ball.width / 2;
     const ballCenterY = ball.positionY + ball.height / 2;
 
@@ -276,7 +319,8 @@ function isCornerHit(ball, brick) {
     return Math.abs(dx - dy) < 5; 
 }
 
-
+// Spremanje cigli u listu cigli, na način da se u listu sprema
+// pozicija cigli, dimenzije cigli i boja cigli
 const initBricks = () => {
     bricks = []
     for(let i = 0; i < rows; i++) {
@@ -300,6 +344,10 @@ const initBricks = () => {
     }
 }
 
+// Prilikom učitavanja radi se dohvat elementa gameCanvas te se 
+// ispisuje valjana poruka na sredini ekrana canvas, pokretanje 
+// rekurzivne petlje update koja se stalno vrti, te dohvat 
+// maksimalnog broja ostvarenih bodova koji su spremljeni u localStorage
 window.onload = () => {
     const canvas = document.getElementById("gameCanvas");
     const context = canvas.getContext("2d");
@@ -322,6 +370,9 @@ window.onload = () => {
     requestAnimationFrame(() => update(context))
 }
 
+// Glavna petlja igre koja u sebi sadrži logiku za iscrtavanje
+// svih elementa vidljivih na ekrana i logika koja se prikazuje nakon
+// gubitka odnosno pobijede
 const update = (context) => {
     if(gameStarted) {
         if(!gameOver) {
